@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Your Track</title>
+  <link rel="stylesheet" href="/static/style.css">
+  
+  <script src="https://cdn.jsdelivr.net/combine/npm/tone@14.7.58,npm/@magenta/music@1.23.1/es6/core.js,npm/focus-visible@5,npm/html-midi-player@1.5.0"></script>
+</head>
+<body class="dark">
+
+<header class="topbar">
+  <div class="theme-toggle" id="themeToggle">🌙</div>
+
+  <div class="brand small">
+    <span class="logo-text">CoverComposer</span>
+    <span class="logo-glow"></span>
+  </div>
+</header>
+
+<div class="container page-enter">
+  <h2 class="headline">Your track is ready</h2>
+
+  <div class="card">
+    <div class="meta">
+      <span>{{ mood }}</span>
+      <span>{{ genre }}</span>
+      <span>{{ tempo }} BPM</span>
+      <span>{{ style }}</span>
+    </div>
+
+    <midi-player
+      src="{{ audio }}"
+      sound-font
+      visualizer="#myVisualizer">
+    </midi-player>
+    
+    <div class="buttons">
+      <a href="/download/{{ filename }}" style="width: 100%">
+        <button class="secondary">Download MIDI</button>
+      </a>
+      <a href="/" style="width: 100%">
+        <button class="primary" style="margin-top:0">Create Another</button>
+      </a>
+    </div>
+
+    {% if history %}
+    <div class="history-section">
+      <div class="history-title">Recent History</div>
+      {% for item in history %}
+      <div class="history-item">
+        <span>{{ item.mood }} {{ item.genre }}</span>
+        <a href="/download/{{ item.filename }}">⬇ {{ item.time }}</a>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+
+<script>
+  // Apply saved theme on load
+  const savedTheme = localStorage.getItem('theme') || 'dark';
+  document.body.className = savedTheme;
+  const toggle = document.getElementById("themeToggle");
+  toggle.textContent = savedTheme === 'dark' ? "🌙" : "☀";
+
+  toggle.onclick = () => {
+    const isDark = document.body.classList.contains('dark');
+    if (isDark) {
+      document.body.classList.replace('dark', 'light');
+      localStorage.setItem('theme', 'light');
+      toggle.textContent = "☀";
+    } else {
+      document.body.classList.replace('light', 'dark');
+      localStorage.setItem('theme', 'dark');
+      toggle.textContent = "🌙";
+    }
+  };
+</script>
+
+</body>
+</html>

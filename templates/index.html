@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CoverComposer</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="dark">
+
+<header class="topbar">
+  <div class="theme-toggle" id="themeToggle">🌙</div>
+
+  <div class="brand">
+    <span class="logo-text">CoverComposer</span>
+    <span class="logo-glow"></span>
+  </div>
+</header>
+
+<div class="container page-enter">
+  <h2 class="headline">Create your sound</h2>
+  <p class="subtitle">Shape a track that matches your mood</p>
+
+  <form method="post" class="card">
+    <label>🎭 Mood</label>
+    <select name="mood">
+      <option>Energetic</option>
+      <option>Happy</option>
+      <option>Sad</option>
+      <option>Calm</option>
+    </select>
+
+    <label>🎼 Genre</label>
+    <select name="genre">
+      <option>Pop</option>
+      <option>Rock</option>
+      <option>Jazz</option>
+      <option>Electronic</option>
+    </select>
+
+    <label>⏱ Tempo</label>
+    <input type="number" name="tempo" value="120">
+
+    <label>🎚 Style</label>
+    <select name="style">
+      <option>Simple</option>
+      <option selected>Complex</option>
+    </select>
+
+    <button class="primary">Generate Track</button>
+  </form>
+</div>
+
+<script>
+  // Apply saved theme on load
+  const savedTheme = localStorage.getItem('theme') || 'dark';
+  document.body.className = savedTheme;
+  const toggle = document.getElementById("themeToggle");
+  toggle.textContent = savedTheme === 'dark' ? "🌙" : "☀";
+
+  toggle.onclick = () => {
+    const isDark = document.body.classList.contains('dark');
+    if (isDark) {
+      document.body.classList.replace('dark', 'light');
+      localStorage.setItem('theme', 'light');
+      toggle.textContent = "☀";
+    } else {
+      document.body.classList.replace('light', 'dark');
+      localStorage.setItem('theme', 'dark');
+      toggle.textContent = "🌙";
+    }
+  };
+</script>
+
+</body>
+</html>

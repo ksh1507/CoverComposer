@@ -85,38 +85,132 @@
         </midi-player>
         {% endif %}
       </div>
+<div class="buttons" style="display: flex; flex-direction: column; gap: 14px; margin-top: 20px;">
 
-      <div class="buttons">
-        {% if wav_filename %}
-        <a href="/download/{{ wav_filename }}" style="width: 100%">
-          <button class="primary">Download WAV 🎵</button>
-        </a>
-        {% endif %}
+  {% if wav_filename %}
+  <a href="/download/{{ wav_filename }}" style="width: 100%; text-decoration: none;">
+    <button
+      style="
+        width: 100%;
+        padding: 14px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #22c55e, #16a34a);
+        color: #000;
+        font-weight: 600;
+        font-size: 15px;
+        border: none;
+        cursor: pointer;
+      ">
+      <i class="fas fa-file-audio"></i> Download WAV
+    </button>
+  </a>
+  {% endif %}
 
-        <a href="/download/{{ filename }}" style="width: 100%">
-          <button class="secondary">Download MIDI</button>
-        </a>
+  <a href="/download/{{ filename }}" style="width: 100%; text-decoration: none;">
+    <button
+      style="
+        width: 100%;
+        padding: 14px;
+        border-radius: 12px;
+        background: transparent;
+        color: #22c55e;
+        font-weight: 600;
+        font-size: 15px;
+        border: 1.5px solid #22c55e;
+        cursor: pointer;
+      ">
+      <i class="fas fa-music"></i> Download MIDI
+    </button>
+  </a>
 
-        <a href="/" style="width: 100%">
-          <button class="secondary" style="border: none; color: #888;">Create Another</button>
-        </a>
+  <a href="/" style="width: 100%; text-decoration: none;">
+    <button
+      style="
+        width: 100%;
+        padding: 14px;
+        border-radius: 12px;
+        background: transparent;
+        color: #9ca3af;
+        font-weight: 600;
+        font-size: 14px;
+        border: 1.5px dashed #374151;
+        cursor: pointer;
+      ">
+      <i class="fas fa-plus-circle"></i> Create Another
+    </button>
+  </a>
+
+</div>
+
+
+
+  {% if history %}
+<div style="margin-top: 30px;">
+  <h3 style="margin-bottom: 14px;">Recent Tracks</h3>
+
+  {% for item in history %}
+  <div
+    style="
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      margin-bottom: 10px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+    "
+  >
+    <!-- Left: cover + info -->
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <div
+        style="
+          width: 42px;
+          height: 42px;
+          border-radius: 8px;
+          background: radial-gradient(circle at top left, #f59e0b, #7c2d12);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 16px;
+        "
+      >
+        🎵
       </div>
 
-      {% if history %}
-      <div class="history-section">
-        <div class="history-title">Recent History</div>
-        {% for item in history %}
-        <div class="history-item">
-          <span>{{ item.mood }} {{ item.genre }}</span>
-          <a href="/download/{{ item.filename.replace('.mid', '.wav') }}">⬇ {{ item.created_at }}</a>
+      <div>
+        <div style="font-weight: 600;">
+          {{ item.genre }} {{ item.mood }}
         </div>
-        {% endfor %}
+        <div style="font-size: 12px; opacity: 0.7;">
+          {{ item.created_at }}
+        </div>
       </div>
-      {% endif %}
-
     </div>
 
+    <!-- Right: actions -->
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <a
+        href="/download/{{ item.filename }}"
+        title="Download MIDI"
+        style="color: #9ca3af; text-decoration: none;"
+      >
+        <i class="fas fa-download"></i>
+      </a>
+
+      <a
+        href="/download/{{ item.filename.replace('.mid', '.wav') }}"
+        title="Download WAV"
+        style="color: #22c55e; text-decoration: none;"
+      >
+        <i class="fas fa-file-audio"></i>
+      </a>
+    </div>
   </div>
+  {% endfor %}
+</div>
+{% endif %}
+
 
 
   <script src="https://cdn.jsdelivr.net/npm/@magenta/music@1.23.1/es6/core.js"></script>

@@ -4,53 +4,138 @@
   <meta charset="UTF-8">
   <title>Login - CoverComposer</title>
   <link rel="stylesheet" href="/static/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    /* --- FORCE PERFECT CENTER --- */
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .container {
+      margin: 0;
+    }
+
+    /* --- ANIMATED BUTTONS --- */
+    .btn-login {
+      width: 100%;
+      padding: 12px;
+      border-radius: 12px;
+      border: none;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      color: black;
+      background: linear-gradient(120deg, #1db954, #1ed760, #1db954);
+      background-size: 200% auto;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      animation: gradient-move 4s linear infinite;
+    }
+
+    .btn-login:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(29, 185, 84, 0.5);
+    }
+
+    @keyframes gradient-move {
+      to {
+        background-position: 200% center;
+      }
+    }
+
+    .btn-register {
+      width: 100%;
+      padding: 12px;
+      border-radius: 12px;
+      background: transparent;
+      border: 2px solid var(--green);
+      color: var(--green);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-register:hover {
+      background: var(--green);
+      color: black;
+      box-shadow: 0 6px 20px rgba(29, 185, 84, 0.4);
+      transform: translateY(-2px);
+    }
+  </style>
 </head>
+
 <body class="dark">
 
 <div class="theme-toggle" id="themeToggle" style="top: 28px;">🌙</div>
 
 <div class="container page-enter">
   <div class="card">
+
     <div class="brand small" style="position:static; margin-bottom: 20px;">
       <span class="logo-text">CoverComposer</span>
     </div>
 
-    <h2 class="headline">Welcome Back</h2>
+    <h2 class="headline">Welcome!</h2>
     <p class="subtitle">Login to access your saved tracks</p>
 
-    <div id="messageBox" style="color: #ff5555; margin-bottom: 15px; font-size: 14px; display: none;"></div>
+    <!-- Message Box -->
+    <div id="messageBox"
+         style="color:#ff5555; margin-bottom:15px; font-size:14px; display:none;"></div>
 
-    <form action="/login" method="post">
-      <label>👤 Username</label>
-      <input type="text" name="username" required placeholder="Enter your username">
+    <!-- Login Form -->
+    <form action="/login" method="post"
+          style="display:flex; flex-direction:column; gap:14px;">
 
-      <label>🔒 Password</label>
-      <input type="password" name="password" required placeholder="Enter your password">
+      <div>
+        <label>👤 Username</label>
+        <input type="text" name="username" required placeholder="Enter your username">
+      </div>
 
-      <button class="primary">Login</button>
+      <div>
+        <label>🔒 Password</label>
+        <input type="password" name="password" required placeholder="Enter your password">
+      </div>
+
+      <button class="btn-login" style="margin-top:12px;">
+        <i class="fas fa-right-to-bracket"></i> Login
+      </button>
     </form>
 
-    <div style="margin-top: 20px; font-size: 14px; opacity: 0.7;">
-      Don't have an account? <a href="/register" style="color: var(--green); text-decoration: none;">Register here</a>
+    <!-- Divider -->
+    <div style="display:flex; align-items:center; gap:10px; margin:22px 0; opacity:0.5;">
+      <div style="flex:1; height:1px; background:currentColor;"></div>
+      <span style="font-size:12px;">OR</span>
+      <div style="flex:1; height:1px; background:currentColor;"></div>
     </div>
+
+    <!-- Register Button -->
+    <a href="/register" style="text-decoration:none;">
+      <button class="btn-register">
+        <i class="fas fa-user-plus"></i> Create New Account
+      </button>
+    </a>
+
   </div>
 </div>
 
 <script>
-  // 1. Handle Messages (Error/Success)
+  // Handle Messages
   const params = new URLSearchParams(window.location.search);
   const msgBox = document.getElementById('messageBox');
-  
+
   if (params.has('error')) {
     msgBox.textContent = params.get('error');
     msgBox.style.display = 'block';
   } else if (params.has('msg')) {
     msgBox.textContent = params.get('msg');
-    msgBox.style.color = '#1db954'; // Green for success
+    msgBox.style.color = '#1db954';
     msgBox.style.display = 'block';
   }
 
-  // 2. Theme Toggle Logic
+  // Theme Toggle Logic
   const savedTheme = localStorage.getItem('theme') || 'dark';
   document.body.className = savedTheme;
   const toggle = document.getElementById("themeToggle");

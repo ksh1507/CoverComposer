@@ -2,204 +2,196 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <title>Profile - CoverComposer</title>
-    <link rel="stylesheet" href="/static/style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        /* Slight adjustment for profile elements */
-        .profile-card {
-            text-align: center;
-            margin-bottom: 20px;
-        }
+  <meta charset="UTF-8">
+  <title>Profile - CoverComposer</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-        .avatar-large {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            background: var(--green);
-            margin: 0 auto 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 40px;
-            color: black;
-            font-weight: bold;
-        }
+  <style>
+    .profile-card {
+      text-align: center;
+      margin-bottom: 20px;
+    }
 
-        .profile-name {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
+    .avatar-large {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      margin: 0 auto 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      font-weight: bold;
+      color: black;
+      background-color: var(--avatar-color);
+    }
 
-        .profile-meta {
-            font-size: 14px;
-            opacity: 0.7;
-            margin-bottom: 20px;
-        }
+    .profile-name {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
 
-        .stat-bar {
-            display: flex;
-            justify-content: space-around;
-            margin-top: 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            padding-top: 20px;
-        }
+    .profile-meta {
+      font-size: 14px;
+      opacity: 0.7;
+      margin-bottom: 20px;
+    }
 
-        .stat-it {
-            text-align: center;
-        }
+    .stat-bar {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 20px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      padding-top: 20px;
+    }
 
-        .stat-val {
-            font-size: 20px;
-            font-weight: bold;
-            display: block;
-        }
+    .stat-it {
+      text-align: center;
+    }
 
-        .stat-lab {
-            font-size: 12px;
-            opacity: 0.6;
-        }
+    .stat-val {
+      font-size: 20px;
+      font-weight: bold;
+      display: block;
+    }
 
-        .edit-form label {
-            font-size: 13px;
-            font-weight: 600;
-            margin-bottom: 5px;
-            display: block;
-            text-align: left;
-        }
+    .stat-lab {
+      font-size: 12px;
+      opacity: 0.6;
+    }
 
-        .edit-form textarea {
-            width: 100%;
-            border-radius: 8px;
-            padding: 10px;
-            background: rgba(0, 0, 0, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: inherit;
-            font-size: 14px;
-        }
+    .edit-form label {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 5px;
+      display: block;
+      text-align: left;
+    }
 
-        .color-input {
-            width: 100%;
-            height: 40px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            padding: 0;
-        }
-    </style>
+    .edit-form textarea {
+      width: 100%;
+      border-radius: 8px;
+      padding: 10px;
+      background: rgba(0,0,0,0.2);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: inherit;
+      font-size: 14px;
+    }
+
+    .color-input {
+      width: 100%;
+      height: 40px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      padding: 0;
+    }
+  </style>
 </head>
 
 <body class="dark">
 
-    <header class="topbar">
-        <div class="theme-toggle" id="themeToggle">🌙</div>
+<header class="topbar">
+  <div class="theme-toggle" id="themeToggle">🌙</div>
 
-        <div class="brand small">
-            <span class="logo-text">CoverComposer</span>
-            <span class="logo-glow"></span>
-        </div>
+  <div class="brand small">
+    <span class="logo-text">CoverComposer</span>
+    <span class="logo-glow"></span>
+  </div>
 
-        <div class="nav-menu">
-            <a href="/" class="nav-link"><i class="fas fa-music"></i> Create</a>
-            <a href="/dashboard" class="nav-link"><i class="fas fa-chart-line"></i> Dashboard</a>
-            <a href="/profile" class="nav-link active"><i class="fas fa-user"></i> Profile</a>
-            <a href="/logout" class="nav-link"><i class="fas fa-sign-out-alt"></i> Logout</a>
-        </div>
-    </header>
+  <div class="nav-menu">
+    <a href="/" class="nav-link"><i class="fas fa-music"></i> Create</a>
+    <a href="/dashboard" class="nav-link"><i class="fas fa-chart-line"></i> Dashboard</a>
+    <a href="/profile" class="nav-link active"><i class="fas fa-user"></i> Profile</a>
+    <a href="/logout" class="nav-link"><i class="fas fa-sign-out-alt"></i> Logout</a>
+  </div>
+</header>
 
-    <div class="container page-enter">
-        <h2 class="headline">Profile</h2>
-        <p class="subtitle">Manage your account</p>
+<div class="container page-enter">
+  <h2 class="headline">Profile</h2>
+  <p class="subtitle">Manage your account</p>
 
-        <div class="card profile-card">
-            <div class="avatar-large" style="background: {{ user.avatar_color }};">
-                {{ user.username[0].upper() }}
-            </div>
-
-            <div class="profile-name">{{ user.username }}</div>
-            <div class="profile-meta">Joined {{ member_since }}</div>
-
-            <div class="stat-bar">
-                <div class="stat-it">
-                    <span class="stat-val">{{ total_tracks }}</span>
-                    <span class="stat-lab">Tracks</span>
-                </div>
-                <div class="stat-it">
-                    <span class="stat-val">{{ (total_duration // 60) }}m</span>
-                    <span class="stat-lab">Time</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="card">
-            <h3 style="margin-top: 0; margin-bottom: 15px; font-size: 16px;">Customize</h3>
-
-            <form action="/profile/update" method="POST" class="edit-form">
-                <div style="margin-bottom: 15px;">
-                    <label>Personal Bio</label>
-                    <textarea name="bio" rows="3">{{ user.bio }}</textarea>
-                </div>
-
-                <div style="margin-bottom: 20px;">
-                    <label>Avatar Color</label>
-                    <input type="color" name="avatar_color" class="color-input" value="{{ user.avatar_color }}">
-                </div>
-
-                <button
-  type="submit"
-  style="
-    width: 100%;
-    margin-top: 10px;
-    padding: 14px;
-    border-radius: 14px;
-    border: none;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    background: linear-gradient(135deg, #22c55e, #16a34a);
-    color: black;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-  "
->
-  <i class="fas fa-save"></i>
-  Save Changes
-</button>
-
-            </form>
-        </div>
-
-        <div style="margin-top: 30px; opacity: 0.6; text-align: center;">
-            <a href="/logout" style="text-decoration: none; color: inherit; font-size: 13px;">Sign Out</a>
-        </div>
-
+  <div class="card profile-card">
+    <div class="avatar-large" style="--avatar-color: {{ user.avatar_color }};">
+      {{ user.username[0].upper() }}
     </div>
 
-    <script>
-        // Theme Logic
-        const savedTheme = localStorage.getItem('theme') || 'dark';
-        document.body.className = savedTheme;
-        const toggle = document.getElementById("themeToggle");
-        toggle.textContent = savedTheme === 'dark' ? "🌙" : "☀";
+    <div class="profile-name">{{ user.username }}</div>
+    <div class="profile-meta">Joined {{ member_since }}</div>
 
-        toggle.onclick = () => {
-            const isDark = document.body.classList.contains('dark');
-            if (isDark) {
-                document.body.classList.replace('dark', 'light');
-                localStorage.setItem('theme', 'light');
-                toggle.textContent = "☀";
-            } else {
-                document.body.classList.replace('light', 'dark');
-                localStorage.setItem('theme', 'dark');
-                toggle.textContent = "🌙";
-            }
-        };
-    </script>
+    <div class="stat-bar">
+      <div class="stat-it">
+        <span class="stat-val">{{ total_tracks }}</span>
+        <span class="stat-lab">Tracks</span>
+      </div>
+      <div class="stat-it">
+        <span class="stat-val">{{ (total_duration // 60) }}m</span>
+        <span class="stat-lab">Time</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-bottom: 15px;">Customize</h3>
+
+    <form action="/profile/update" method="POST" class="edit-form">
+
+      <label>Personal Bio</label>
+      <textarea name="bio" rows="3">{{ user.bio }}</textarea>
+
+      <label style="margin-top:15px;">Avatar Color</label>
+      <input type="color"
+             name="avatar_color"
+             class="color-input"
+             value="{{ user.avatar_color }}"
+             oninput="document.querySelector('.avatar-large').style.setProperty('--avatar-color', this.value)">
+
+      <button
+        type="submit"
+        style="
+          width: 100%;
+          margin-top: 12px;
+          padding: 14px;
+          border-radius: 14px;
+          border: none;
+          font-size: 15px;
+          font-weight: 600;
+          cursor: pointer;
+          background: linear-gradient(135deg, #22c55e, #16a34a);
+          color: black;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+        "
+      >
+        <i class="fas fa-save"></i>
+        Save Changes
+      </button>
+
+    </form>
+  </div>
+
+  <div style="margin-top:30px;opacity:0.6;text-align:center;">
+    <a href="/logout" style="color:inherit;text-decoration:none;font-size:13px;">Sign Out</a>
+  </div>
+</div>
+
+<script>
+  const savedTheme = localStorage.getItem("theme") || "dark";
+  document.body.className = savedTheme;
+  const toggle = document.getElementById("themeToggle");
+  toggle.textContent = savedTheme === "dark" ? "🌙" : "☀";
+
+  toggle.onclick = () => {
+    document.body.classList.toggle("dark");
+    document.body.classList.toggle("light");
+    localStorage.setItem("theme", document.body.className);
+    toggle.textContent = document.body.classList.contains("dark") ? "🌙" : "☀";
+  };
+</script>
 
 </body>
-
 </html>

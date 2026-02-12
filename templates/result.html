@@ -1,84 +1,253 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <title>Your Track</title>
   <link rel="stylesheet" href="/static/style.css">
-  
-  <script src="https://cdn.jsdelivr.net/combine/npm/tone@14.7.58,npm/@magenta/music@1.23.1/es6/core.js,npm/focus-visible@5,npm/html-midi-player@1.5.0"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+
 <body class="dark">
 
-<header class="topbar">
-  <div class="theme-toggle" id="themeToggle">🌙</div>
+  <header class="topbar">
+    <div class="theme-toggle" id="themeToggle">🌙</div>
 
-  <div class="brand small">
-    <span class="logo-text">CoverComposer</span>
-    <span class="logo-glow"></span>
-  </div>
-</header>
-
-<div class="container page-enter">
-  <h2 class="headline">Your track is ready</h2>
-
-  <div class="card">
-    <div class="meta">
-      <span>{{ mood }}</span>
-      <span>{{ genre }}</span>
-      <span>{{ tempo }} BPM</span>
-      <span>{{ style }}</span>
+    <div class="brand small">
+      <span class="logo-text">CoverComposer</span>
+      <span class="logo-glow"></span>
     </div>
 
-    <midi-player
-      src="{{ audio }}"
-      sound-font
-      visualizer="#myVisualizer">
-    </midi-player>
-    
-    <div class="buttons">
-      <a href="/download/{{ filename }}" style="width: 100%">
-        <button class="secondary">Download MIDI</button>
-      </a>
-      <a href="/" style="width: 100%">
-        <button class="primary" style="margin-top:0">Create Another</button>
-      </a>
+    <div class="nav-menu">
+      <a href="/" class="nav-link"><i class="fas fa-music"></i> Create</a>
+      <a href="/dashboard" class="nav-link"><i class="fas fa-chart-line"></i> Dashboard</a>
+      <a href="/profile" class="nav-link"><i class="fas fa-user"></i> Profile</a>
+      <a href="/logout" class="nav-link"><i class="fas fa-sign-out-alt"></i> Logout</a>
     </div>
+  </header>
 
-    {% if history %}
-    <div class="history-section">
-      <div class="history-title">Recent History</div>
-      {% for item in history %}
-      <div class="history-item">
-        <span>{{ item.mood }} {{ item.genre }}</span>
-        <a href="/download/{{ item.filename }}">⬇ {{ item.time }}</a>
+
+  <div class="container page-enter">
+    <h2 class="headline">Your track is ready</h2>
+
+    <div class="card">
+      {% if cover_art %}
+      <div style="text-align: center; margin-bottom: 25px;">
+        <img src="/static/output/{{ cover_art }}" alt="Album Art"
+          style="width: 250px; height: 250px; object-fit: cover; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1);">
       </div>
-      {% endfor %}
+      {% endif %}
+
+      <div class="meta">
+        <span>{{ mood }}</span>
+        <span>{{ genre }}</span>
+        <span>{{ tempo }} BPM</span>
+        <span>{{ style }}</span>
+      </div>
+
+      {% if prompt %}
+      <div style="margin-bottom: 20px; font-style: italic; opacity: 0.7; font-size: 14px;">
+        "{{ prompt }}"
+      </div>
+      {% endif %}
+
+      {% if ai_reasoning %}
+      <div class="musicologist-card">
+        <div class="musicologist-header">
+          <span class="icon-pulse"><i class="fas fa-brain"></i></span>
+          <span class="musicologist-title">AI Musicologist Insight</span>
+        </div>
+        <p class="musicologist-text">{{ ai_reasoning }}</p>
+      </div>
+      {% endif %}
+
+      {% if lyrics %}
+      <div class="lyrics-card">
+        <div class="lyrics-header">
+          <i class="fas fa-microphone-alt"></i> Generated Lyrics
+        </div>
+        <p class="lyrics-text">{{ lyrics }}</p>
+      </div>
+      {% endif %}
+
+      <div class="player-wrapper">
+        <canvas id="visualizer" width="800" height="200"
+          style="width: 100%; height: 150px; background: #000; border-radius: 10px; margin-bottom: 15px;"></canvas>
+
+        {% if wav_filename %}
+        <audio id="audioPlayer" controls autoplay crossorigin="anonymous" style="width: 100%; margin-bottom: 20px;">
+          <source src="/static/output/{{ wav_filename }}" type="audio/wav">
+          Your browser does not support the audio element.
+        </audio>
+        {% else %}
+        <p style="font-size: 12px; color: #ff5555;">(WAV conversion failed, using MIDI preview)</p>
+        <midi-player src="{{ audio }}" sound-font visualizer="#visualizer">
+        </midi-player>
+        {% endif %}
+      </div>
+
+      <div class="buttons">
+        {% if wav_filename %}
+        <a href="/download/{{ wav_filename }}" style="width: 100%">
+          <button class="primary">Download WAV 🎵</button>
+        </a>
+        {% endif %}
+
+        <a href="/download/{{ filename }}" style="width: 100%">
+          <button class="secondary">Download MIDI</button>
+        </a>
+
+        <a href="/" style="width: 100%">
+          <button class="secondary" style="border: none; color: #888;">Create Another</button>
+        </a>
+      </div>
+
+      {% if history %}
+      <div class="history-section">
+        <div class="history-title">Recent History</div>
+        {% for item in history %}
+        <div class="history-item">
+          <span>{{ item.mood }} {{ item.genre }}</span>
+          <a href="/download/{{ item.filename.replace('.mid', '.wav') }}">⬇ {{ item.created_at }}</a>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
     </div>
-    {% endif %}
 
   </div>
-</div>
 
-<script>
-  // Apply saved theme on load
-  const savedTheme = localStorage.getItem('theme') || 'dark';
-  document.body.className = savedTheme;
-  const toggle = document.getElementById("themeToggle");
-  toggle.textContent = savedTheme === 'dark' ? "🌙" : "☀";
 
-  toggle.onclick = () => {
-    const isDark = document.body.classList.contains('dark');
-    if (isDark) {
-      document.body.classList.replace('dark', 'light');
-      localStorage.setItem('theme', 'light');
-      toggle.textContent = "☀";
-    } else {
-      document.body.classList.replace('light', 'dark');
-      localStorage.setItem('theme', 'dark');
-      toggle.textContent = "🌙";
-    }
-  };
-</script>
+  <script src="https://cdn.jsdelivr.net/npm/@magenta/music@1.23.1/es6/core.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html-midi-player@1.5.0/dist/midi-player.min.js"></script>
+
+  <script>
+    // Theme Logic
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    document.body.className = savedTheme;
+    const toggle = document.getElementById("themeToggle");
+    toggle.textContent = savedTheme === 'dark' ? "🌙" : "☀";
+
+    toggle.onclick = () => {
+      const isDark = document.body.classList.contains('dark');
+      if (isDark) {
+        document.body.classList.replace('dark', 'light');
+        localStorage.setItem('theme', 'light');
+        toggle.textContent = "☀";
+      } else {
+        document.body.classList.replace('light', 'dark');
+        localStorage.setItem('theme', 'dark');
+        toggle.textContent = "🌙";
+      }
+    };
+
+    // --- VISUALIZER LOGIC ---
+    window.addEventListener('load', () => {
+      const audio = document.getElementById('audioPlayer');
+      if (!audio) return; // MIDI player handles its own viz
+
+      const canvas = document.getElementById('visualizer');
+      const ctx = canvas.getContext('2d');
+      let audioContext, analyser, source;
+
+      // User interaction needed to start AudioContext
+      document.body.addEventListener('click', initAudio, { once: true });
+      audio.addEventListener('play', initAudio);
+
+      function initAudio() {
+        if (audioContext) return;
+
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        analyser = audioContext.createAnalyser();
+        source = audioContext.createMediaElementSource(audio);
+
+        source.connect(analyser);
+        analyser.connect(audioContext.destination);
+
+        // FFT Size: Balance between detail and smoothness
+        analyser.fftSize = 256;
+        const bufferLength = analyser.frequencyBinCount;
+        const dataArray = new Uint8Array(bufferLength);
+
+        function draw() {
+          requestAnimationFrame(draw);
+          analyser.getByteFrequencyData(dataArray);
+
+          // trails
+          ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+          const cy = canvas.height / 2;
+          const barWidth = canvas.width / bufferLength;
+
+          // Create gradient
+          const gradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
+          gradient.addColorStop(0, '#1db954');
+          gradient.addColorStop(0.5, '#4aff95');
+          gradient.addColorStop(1, '#1db954');
+
+          ctx.lineWidth = 2;
+          ctx.strokeStyle = gradient;
+          ctx.fillStyle = "rgba(29, 185, 84, 0.1)"; // faint fill
+
+          ctx.beginPath();
+          ctx.moveTo(0, cy);
+
+          // Draw smooth wave
+          // We'll effectively draw a spline through the frequency points
+          // To make it "wavey", we treat frequency data as the amplitude of the wave at that x-position.
+
+          // First pass: Top half
+          for (let i = 0; i < bufferLength; i++) {
+            const amp = dataArray[i];
+            const x = i * barWidth;
+            const y = cy - (amp * 0.8); // Scale amplitude (Increased for more wave)
+
+            // Curve smoothing
+            if (i === 0) {
+              ctx.moveTo(x, y);
+            } else {
+              const prevX = (i - 1) * barWidth;
+              const prevAmp = dataArray[i - 1];
+              const prevY = cy - (prevAmp * 0.4);
+
+              const cpX = (prevX + x) / 2;
+              const cpY = (prevY + y) / 2;
+              // Quad curve for smoother peaks
+              ctx.quadraticCurveTo(prevX, prevY, cpX, cpY);
+            }
+          }
+          // End of top line
+          ctx.lineTo(canvas.width, cy);
+
+          // Second pass: Bottom half (Mirror)
+          for (let i = bufferLength - 1; i >= 0; i--) {
+            const amp = dataArray[i];
+            const x = i * barWidth;
+            const y = cy + (amp * 0.8);
+
+            const prevX = (i + 1) * barWidth;
+            // Simple lineTo for bottom to complete the shape efficiently, or curve again
+            ctx.lineTo(x, y);
+          }
+
+          ctx.closePath();
+          ctx.stroke();
+          ctx.fill();
+
+          // Add extra "Glow" line in the center
+          ctx.beginPath();
+          ctx.moveTo(0, cy);
+          ctx.lineTo(canvas.width, cy);
+          ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
+          ctx.stroke();
+        }
+        draw();
+      }
+    });
+  </script>
 
 </body>
+
 </html>

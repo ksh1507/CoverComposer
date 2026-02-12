@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login - CoverComposer</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="dark">
+
+<div class="theme-toggle" id="themeToggle" style="top: 28px;">🌙</div>
+
+<div class="container page-enter">
+  <div class="card">
+    <div class="brand small" style="position:static; margin-bottom: 20px;">
+      <span class="logo-text">CoverComposer</span>
+    </div>
+
+    <h2 class="headline">Welcome Back</h2>
+    <p class="subtitle">Login to access your saved tracks</p>
+
+    <div id="messageBox" style="color: #ff5555; margin-bottom: 15px; font-size: 14px; display: none;"></div>
+
+    <form action="/login" method="post">
+      <label>👤 Username</label>
+      <input type="text" name="username" required placeholder="Enter your username">
+
+      <label>🔒 Password</label>
+      <input type="password" name="password" required placeholder="Enter your password">
+
+      <button class="primary">Login</button>
+    </form>
+
+    <div style="margin-top: 20px; font-size: 14px; opacity: 0.7;">
+      Don't have an account? <a href="/register" style="color: var(--green); text-decoration: none;">Register here</a>
+    </div>
+  </div>
+</div>
+
+<script>
+  // 1. Handle Messages (Error/Success)
+  const params = new URLSearchParams(window.location.search);
+  const msgBox = document.getElementById('messageBox');
+  
+  if (params.has('error')) {
+    msgBox.textContent = params.get('error');
+    msgBox.style.display = 'block';
+  } else if (params.has('msg')) {
+    msgBox.textContent = params.get('msg');
+    msgBox.style.color = '#1db954'; // Green for success
+    msgBox.style.display = 'block';
+  }
+
+  // 2. Theme Toggle Logic
+  const savedTheme = localStorage.getItem('theme') || 'dark';
+  document.body.className = savedTheme;
+  const toggle = document.getElementById("themeToggle");
+  toggle.textContent = savedTheme === 'dark' ? "🌙" : "☀";
+
+  toggle.onclick = () => {
+    const isDark = document.body.classList.contains('dark');
+    if (isDark) {
+      document.body.classList.replace('dark', 'light');
+      localStorage.setItem('theme', 'light');
+      toggle.textContent = "☀";
+    } else {
+      document.body.classList.replace('light', 'dark');
+      localStorage.setItem('theme', 'dark');
+      toggle.textContent = "🌙";
+    }
+  };
+</script>
+
+</body>
+</html>

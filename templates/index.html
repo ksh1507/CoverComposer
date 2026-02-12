@@ -1,75 +1,265 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
-  <title>CoverComposer</title>
+  <title>CoverComposer - Magic Mode</title>
   <link rel="stylesheet" href="/static/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    .magic-input-container {
+      position: relative;
+      margin-bottom: 30px;
+    }
+
+    .magic-textarea {
+      width: 100%;
+      height: 120px;
+      padding: 20px;
+      border-radius: 20px;
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      background: rgba(0, 0, 0, 0.3);
+      color: white;
+      font-size: 16px;
+      resize: none;
+      transition: all 0.3s;
+    }
+
+    .magic-textarea:focus {
+      border-color: var(--green);
+      outline: none;
+      box-shadow: 0 0 20px rgba(29, 185, 84, 0.2);
+    }
+
+    .magic-btn {
+      position: absolute;
+      bottom: 15px;
+      right: 15px;
+      background: var(--green);
+      color: black;
+      border: none;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      cursor: pointer;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s, box-shadow 0.2s;
+      animation: pulse-btn 3s infinite;
+    }
+
+    .magic-btn:hover {
+      animation: none;
+      transform: scale(1.1);
+      box-shadow: 0 0 20px rgba(29, 185, 84, 0.6);
+    }
+
+    @keyframes pulse-btn {
+      0% {
+        box-shadow: 0 0 0 0 rgba(29, 185, 84, 0.7);
+        transform: scale(1);
+      }
+
+      70% {
+        box-shadow: 0 0 0 10px rgba(29, 185, 84, 0);
+        transform: scale(1.05);
+      }
+
+      100% {
+        box-shadow: 0 0 0 0 rgba(29, 185, 84, 0);
+        transform: scale(1);
+      }
+    }
+
+    .scif-loader {
+      display: none;
+      text-align: center;
+      margin-top: 20px;
+      font-size: 14px;
+      opacity: 0.8;
+      color: var(--green);
+    }
+  </style>
 </head>
+
 <body class="dark">
 
-<header class="topbar">
-  <div class="theme-toggle" id="themeToggle">🌙</div>
+  <header class="topbar">
+    <div class="theme-toggle" id="themeToggle">🌙</div>
 
-  <div class="brand">
-    <span class="logo-text">CoverComposer</span>
-    <span class="logo-glow"></span>
+    <div class="brand small">
+      <span class="logo-text">CoverComposer</span>
+      <span class="logo-glow"></span>
+    </div>
+
+    <!-- Navigation below title -->
+    <div class="nav-menu">
+      <a href="/" class="nav-link active"><i class="fas fa-magic"></i> Magic</a>
+      <a href="/dashboard" class="nav-link"><i class="fas fa-chart-line"></i> Dashboard</a>
+      <a href="/profile" class="nav-link"><i class="fas fa-user"></i> Profile</a>
+      <a href="/logout" class="nav-link"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </div>
+  </header>
+
+  <div class="container page-enter">
+    <h2 class="headline">Describe your song</h2>
+    <p class="subtitle">AI will compose the music for you</p>
+
+    <form method="post" action="/" class="card" onsubmit="showLoader()">
+      <div class="magic-input-container">
+        <textarea id="promptInput" name="prompt" class="magic-textarea"
+          placeholder="e.g. A cyberpunk detective walking in the rain at midnight, feeling mysterious and tense..."></textarea>
+        <button type="button" class="magic-btn secondary-magic" onclick="surpriseMe()"
+          style="right: 65px; background: rgba(255,255,255,0.1); color: white;">
+          <i class="fas fa-dice"></i>
+        </button>
+        <button type="submit" class="magic-btn">
+          <i class="fas fa-wand-magic-sparkles"></i>
+        </button>
+      </div>
+
+      <!-- Hidden detailed controls for manual fallback if prompt is empty -->
+      <details style="text-align: left; opacity: 0.7; font-size: 13px;">
+        <summary style="cursor: pointer; margin-bottom: 10px;">Manual Controls (Optional)</summary>
+
+        <label>🎭 Mood</label>
+        <label>🎭 Mood</label>
+        <div class="mood-chips">
+          <div class="mood-chip active" onclick="selectMood(this, 'Energetic')">⚡ Energetic</div>
+          <div class="mood-chip" onclick="selectMood(this, 'Happy')">😊 Happy</div>
+          <div class="mood-chip" onclick="selectMood(this, 'Sad')">🌧 Sad</div>
+          <div class="mood-chip" onclick="selectMood(this, 'Calm')">🍃 Calm</div>
+        </div>
+        <select name="mood" id="moodSelect" style="display:none;">
+          <option value="Energetic" selected>Energetic</option>
+          <option value="Happy">Happy</option>
+          <option value="Sad">Sad</option>
+          <option value="Calm">Calm</option>
+        </select>
+
+        <label>🎼 Genre</label>
+        <select name="genre">
+          <option>Pop</option>
+          <option>Rock</option>
+          <option>Jazz</option>
+          <option>Electronic</option>
+        </select>
+
+        <label>⏱ Tempo</label>
+        <input type="number" name="tempo" value="120">
+
+        <label>🎸 Instrument</label>
+        <select name="instrument">
+          {% for name, prog_id in instruments.items() %}
+          <option value="{{ prog_id }}">{{ name }}</option>
+          {% endfor %}
+        </select>
+      </details>
+
+      <!-- MODERN ORB LOADER -->
+      <div id="orbLoader" class="orb-container" style="display: none;">
+        <div class="orb"></div>
+        <div class="orb-ring"></div>
+        <p id="loadingText" class="loading-text">Synthesizing...</p>
+      </div>
+
+    </form>
   </div>
-</header>
 
-<div class="container page-enter">
-  <h2 class="headline">Create your sound</h2>
-  <p class="subtitle">Shape a track that matches your mood</p>
+  <script>
+    function showLoader() {
+      document.getElementById('orbLoader').style.display = 'flex';
 
-  <form method="post" class="card">
-    <label>🎭 Mood</label>
-    <select name="mood">
-      <option>Energetic</option>
-      <option>Happy</option>
-      <option>Sad</option>
-      <option>Calm</option>
-    </select>
+      const texts = [
+        "Analyzing Vibe...",
+        "Composing Melody...",
+        "Adding Drums...",
+        "Mixing Audio...",
+        "Polishing..."
+      ];
 
-    <label>🎼 Genre</label>
-    <select name="genre">
-      <option>Pop</option>
-      <option>Rock</option>
-      <option>Jazz</option>
-      <option>Electronic</option>
-    </select>
+      let i = 0;
+      const textEl = document.getElementById('loadingText');
 
-    <label>⏱ Tempo</label>
-    <input type="number" name="tempo" value="120">
-
-    <label>🎚 Style</label>
-    <select name="style">
-      <option>Simple</option>
-      <option selected>Complex</option>
-    </select>
-
-    <button class="primary">Generate Track</button>
-  </form>
-</div>
-
-<script>
-  // Apply saved theme on load
-  const savedTheme = localStorage.getItem('theme') || 'dark';
-  document.body.className = savedTheme;
-  const toggle = document.getElementById("themeToggle");
-  toggle.textContent = savedTheme === 'dark' ? "🌙" : "☀";
-
-  toggle.onclick = () => {
-    const isDark = document.body.classList.contains('dark');
-    if (isDark) {
-      document.body.classList.replace('dark', 'light');
-      localStorage.setItem('theme', 'light');
-      toggle.textContent = "☀";
-    } else {
-      document.body.classList.replace('light', 'dark');
-      localStorage.setItem('theme', 'dark');
-      toggle.textContent = "🌙";
+      setInterval(() => {
+        textEl.style.opacity = 0;
+        setTimeout(() => {
+          i = (i + 1) % texts.length;
+          textEl.textContent = texts[i];
+          textEl.style.opacity = 1;
+        }, 500);
+      }, 2500);
     }
-  };
-</script>
+
+    const examples = [
+      "A cyberpunk hacker running from authorities in a neon-lit Tokyo rainstorm.",
+      "A lonely astronaut looking at Earth from the window of a silent space station.",
+      "A medieval knight charging into battle with a dragon, epic and heroic.",
+      "A cozy coffee shop in Paris with rain tapping on the window, jazz playing softly.",
+      "A haunted mansion at midnight, with creaking floorboards and a ghostly piano.",
+      "An underwater city of mermaids, peaceful, flowing, and magical.",
+      "A high-speed car chase in a futuristic desert, adrenaline pumping and intense.",
+      "A sad clown sitting on a swing in an empty playground at sunset.",
+      "A robot discovering a flower in a post-apocalyptic wasteland, hopeful but melancholic.",
+      "A victorious gladiator standing in the coliseum, crowd cheering, triumphant.",
+      "A wizard casting a spell in an ancient library, mystical and glittering.",
+      "A relaxing beach at sunrise, waves gently crashing, seagulls calling.",
+      "A detective noir scene in black and white, smoky, smooth, and suspicious.",
+      "A glitch in the matrix, chaotic, digital, and unpredictable.",
+      "A grand royal ball in 18th century Vienna, elegant and sophisticated."
+    ];
+
+    function surpriseMe() {
+      const input = document.getElementById('promptInput');
+      const randomText = examples[Math.floor(Math.random() * examples.length)];
+
+      // Typing effect
+      input.value = "";
+      let i = 0;
+      const speed = 30; // ms per char
+
+      function typeWriter() {
+        if (i < randomText.length) {
+          input.value += randomText.charAt(i);
+          i++;
+          setTimeout(typeWriter, speed);
+        }
+      }
+      typeWriter();
+    }
+
+    // Theme Logic
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    document.body.className = savedTheme;
+    const toggle = document.getElementById("themeToggle");
+    toggle.textContent = savedTheme === 'dark' ? "🌙" : "☀";
+
+    toggle.onclick = () => {
+      const isDark = document.body.classList.contains('dark');
+      if (isDark) {
+        document.body.classList.replace('dark', 'light');
+        localStorage.setItem('theme', 'light');
+        toggle.textContent = "☀";
+      } else {
+        document.body.classList.replace('light', 'dark');
+        localStorage.setItem('theme', 'dark');
+        toggle.textContent = "🌙";
+      }
+    };
+
+    // Mood Chip Logic
+    function selectMood(chip, value) {
+      // Visual update
+      document.querySelectorAll('.mood-chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+
+      // Data update
+      document.getElementById('moodSelect').value = value;
+    }
+  </script>
 
 </body>
+
 </html>

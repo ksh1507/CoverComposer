@@ -5,3 +5,11 @@ python-multipart
 midiutil
 pydantic
 aiofiles
+midi2audio
+pyfluidsynth
+sqlalchemy
+passlib[bcrypt]
+python-jose
+cerebras-cloud-sdk
+requests
+pillow

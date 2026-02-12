@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard - CoverComposer</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* Slight adjustment for dashboard list */
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      gap: 10px;
+    }
+
+    .stat-box {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 15px;
+      border-radius: 12px;
+      flex: 1;
+      text-align: center;
+    }
+
+    .stat-num {
+      font-size: 24px;
+      font-weight: bold;
+      color: var(--green);
+      display: block;
+    }
+
+    .stat-lbl {
+      font-size: 12px;
+      opacity: 0.7;
+    }
+
+    .track-list {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .mini-track-card {
+      background: var(--dark-card);
+      padding: 15px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .track-icon {
+      width: 40px;
+      height: 40px;
+      background: rgba(29, 185, 84, 0.1);
+      color: var(--green);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .track-details {
+      flex: 1;
+      text-align: left;
+    }
+
+    .track-title {
+      font-weight: 600;
+      font-size: 15px;
+      margin-bottom: 3px;
+    }
+
+    .track-sub {
+      font-size: 12px;
+      opacity: 0.6;
+    }
+
+    .track-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .icon-btn {
+      color: #888;
+      cursor: pointer;
+      transition: color 0.2s;
+      font-size: 14px;
+      background: none;
+      border: none;
+    }
+
+    .icon-btn:hover {
+      color: var(--green);
+    }
+
+    .icon-btn.danger:hover {
+      color: #ff5555;
+    }
+  </style>
+</head>
+
+<body class="dark">
+
+  <header class="topbar">
+    <div class="theme-toggle" id="themeToggle">🌙</div>
+
+    <div class="brand small">
+      <span class="logo-text">CoverComposer</span>
+      <span class="logo-glow"></span>
+    </div>
+
+    <div class="nav-menu">
+      <a href="/" class="nav-link"><i class="fas fa-music"></i> Create</a>
+      <a href="/dashboard" class="nav-link active"><i class="fas fa-chart-line"></i> Dashboard</a>
+      <a href="/profile" class="nav-link"><i class="fas fa-user"></i> Profile</a>
+      <a href="/logout" class="nav-link"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </div>
+  </header>
+
+  <div class="container page-enter">
+    <h2 class="headline">Your Dashboard</h2>
+    <p class="subtitle">Overview of your musical journey</p>
+
+    <!-- Simple Stats -->
+    <div class="card" style="margin-bottom: 30px;">
+      <div class="stat-row">
+        <div class="stat-box">
+          <span class="stat-num">{{ total_tracks }}</span>
+          <span class="stat-lbl">Tracks</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-num">{{ total_plays }}</span>
+          <span class="stat-lbl">Plays</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-num">{{ favorites_count }}</span>
+          <span class="stat-lbl">Favorites</span>
+        </div>
+      </div>
+
+      <div style="text-align: left;">
+        <h3 style="font-size: 14px; opacity: 0.8; margin-bottom: 15px;">Recent Activity</h3>
+        <!-- Simple CSS Bar Chart for Activity -->
+        <div style="display: flex; align-items: flex-end; height: 60px; gap: 5px;">
+          {% for day in activity_data %}
+          <div
+            style="flex: 1; background: var(--green); opacity: 0.3; border-radius: 3px; height: {{ (day.count / ([activity_data|map(attribute='count')|max, 1]|max) * 100) }}%;">
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <h3 class="headline" style="font-size: 20px; text-align: left; margin-bottom: 15px;">Recent Tracks</h3>
+
+    <div class="track-list">
+      {% if tracks %}
+      {% for track in tracks %}
+      <div class="mini-track-card">
+        {% if track.cover_art %}
+        <img src="/static/output/{{ track.cover_art }}" class="track-icon" style="object-fit: cover;">
+        {% else %}
+        <div class="track-icon">
+          <i class="fas fa-music"></i>
+        </div>
+        {% endif %}
+        <div class="track-details">
+          <div class="track-title">{{ track.genre }} {{ track.mood }}</div>
+          <div class="track-sub">{{ track.created_at }} • {{ track.tempo }} BPM • {{ track.instrument }}</div>
+        </div>
+        <div class="track-actions">
+          <!-- Play -->
+          {% if track.wav_filename %}
+          <a href="#"
+            onclick="playAudio(this, '/static/output/{{ track.wav_filename }}', {{ track.id }}); return false;"
+            class="icon-btn">
+            <i class="fas fa-play"></i>
+          </a>
+          {% endif %}
+
+          <!-- Download -->
+          <a href="/download/{{ track.filename }}" class="icon-btn" title="Download MIDI">
+            <i class="fas fa-download"></i>
+          </a>
+
+          <!-- Delete -->
+          <form action="/track/{{ track.id }}/delete" method="POST" style="display:inline;"
+            onsubmit="return confirm('Delete this track?');">
+            <button type="submit" class="icon-btn danger">
+              <i class="fas fa-trash"></i>
+            </button>
+          </form>
+        </div>
+      </div>
+      {% endfor %}
+      {% else %}
+      <div class="card" style="opacity: 0.6;">
+        <p>No tracks yet. Create one!</p>
+      </div>
+      {% endif %}
+    </div>
+
+  </div>
+
+  <script>
+    // Theme Logic from index.html
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    document.body.className = savedTheme;
+    const toggle = document.getElementById("themeToggle");
+    toggle.textContent = savedTheme === 'dark' ? "🌙" : "☀";
+
+    toggle.onclick = () => {
+      const isDark = document.body.classList.contains('dark');
+      if (isDark) {
+        document.body.classList.replace('dark', 'light');
+        localStorage.setItem('theme', 'light');
+        toggle.textContent = "☀";
+      } else {
+        document.body.classList.replace('light', 'dark');
+        localStorage.setItem('theme', 'dark');
+        toggle.textContent = "🌙";
+      }
+    };
+
+    let currentAudio = null;
+    function playAudio(btn, src, id) {
+      if (currentAudio) {
+        currentAudio.pause();
+        currentAudio = null;
+      }
+      const audio = new Audio(src);
+      audio.play();
+      currentAudio = audio;
+
+      // Increment play count via fetch
+      fetch(`/track/${id}/play`, { method: 'POST' });
+    }
+  </script>
+
+</body>
+
+</html>

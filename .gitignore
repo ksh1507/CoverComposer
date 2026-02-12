@@ -1,7 +1,13 @@
 __pycache__/
-venv/
-env/
+*.pyc
+
+# databases (optional)
+*.db
+
+# system files
+*.dll
+*.exe
+
+# env
 .env
-.DS_Store
-static/output/*
-!static/output/.gitkeep
+venv/
